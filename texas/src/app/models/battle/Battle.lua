@@ -82,8 +82,8 @@ function Battle:gameprocess(game)
 			pokertbl[5] = true
 
 		self:deskwin(game,pokertbl)
-		xx.delay(0, function()
-		game:result("royalflsh",1)
+		xx.delay(7, function()
+		game:result("flush",2)
 		end)
 end	
 

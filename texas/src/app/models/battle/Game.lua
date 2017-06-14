@@ -172,40 +172,29 @@ function Game:gameplayer(playertbl)
 end
 
 -----
-function Game:result(rank,idx,cardtbl)
-	self:dark(self.scene)
+function Game:result(rank,idx,cardtbl)	
 	self:createrank(rank)	
 		
 	local ft = self.playertbl[idx]
-	ft:setopacity(1,true)
-	ft:win("straight",1)
+	ft:zorder(2)
+	ft:win(rank,1)
 end
 
-function Game:dark(node)
-	if node == self.scene then
-		local ch=node:getChildren()
-		dump(ch)
-		for _, child in pairs(ch) do
-			child:setopacity(0.4,true)
-		end
-	else 
-		node:setopacity(0.4,true)
-	end
-end
 
 function Game:createrank(rank)
-	
-	local lback = self:rankimg(self.scene,"back", cc.p(0.55,0.47), cc.p(1,0.5))
+	local underlay = xxui.Underlay.new(self.scene, 2, nil, 0.4)
+	underlay:setLocalZOrder(2)
+	local lback = self:rankimg(underlay,"back", cc.p(0.5,0.52), cc.p(1,0.5))
 
 	lback:setRotation(-3)
-	local rback = self:rankimg(self.scene,"back", cc.p(0.5,0.47), cc.p(1,0.5))
+	local rback = self:rankimg(underlay,"back", cc.p(0.5,0.52), cc.p(1,0.5))
 	rback:setFlippedX(true)
 	rback:setRotation(-3)
-	local light = self:rankimg(self.scene,"light",cc.p(0.5,0.76))
+	local light = self:rankimg(underlay,"light",cc.p(0.5,0.76))
 	local rank = self:rankimg(light,rank,cc.p(0.5,0.5))
 	local lflower = self:rankimg(rank,"flower", cc.p(-0.08,0.5))
 	
-	local rflower = self:rankimg(rank,"flower", cc.p(-0.08,0.5))
+	local rflower = self:rankimg(rank,"flower", cc.p(1.08,0.5))
 	rflower:setFlippedX(true)
 
 end

@@ -6,7 +6,7 @@ window = class("window", function()
 end)
 
 -- stage: 所添加到的父节点
--- mode: 大弹窗 1，小弹窗 2
+-- mode: 大弹窗 1，小弹窗 2 , 传1.5,2.5 无关闭按钮
 -- delete: boolean, 点击关闭时是否删除自身
 function window:ctor(stage, mode, delete)
 	self.mode_ = mode
@@ -15,7 +15,9 @@ function window:ctor(stage, mode, delete)
 	self.btn_ = {}
 	-- underlay --
 	local m = delete and 2 or -2
-	self.underlay = xxui.Underlay.new(stage, m, nil, 0.4)
+	local opc = math.floor(mode) == 2 and 0 or 0.4
+	self.underlay = xxui.Underlay.new(stage, m, nil, opc)
+	self.underlay:setLocalZOrder(3)
 	self:createUI(mode)
 end
 
@@ -161,26 +163,28 @@ end
 -- create widgets --
 function window:createUI(mode)
 	local img = "window"
-	if mode == 2 then
+	if math.floor(mode) == 2 then
 		img = img.."_small"
 	end
 	local panel = xxui.create {
-		node = self, img = xxres.panel(img), name = "win_panel"
+		node = self, img = xxres.panel(img), name = "win_panel",
 	}
 	self:setsize(panel)
-	self:set {node = self.underlay, pos = "center"}
+	self:set {node = self.underlay, pos = "center",}
 	self:setTouchEnabled(true)
-	local btn = xxui.create {
-		node = self, btn = xxres.button("close"), name = "win_close",
-		anch = cc.p(1, 1), align = cc.p(1, 1), pos = cc.p(-30, -30),
-		func = function() self:close() end
-	}
-	self:createTitle()
+	if mode % 1 == 0 then 
+		local btn = xxui.create {
+			node = self, btn = xxres.button("win_close"), name = "win_close",
+			anch = cc.p(1, 1), align = cc.p(1, 1), pos = cc.p(-30, -30),
+			func = function() self:close() end
+		}
+	end
+	-- self:createTitle()
 end
 
 function window:createTitle()
 	xxui.create {
-		node = self, txt = "弹窗", name = "win_title",
+		node = self, txt = "", name = "win_title",
 		font = "txt", size = 40, anch = cc.p(0.5, 1),
 		align = cc.p(0.5, 1), pos = cc.p(0, -35)
 	}

@@ -70,49 +70,11 @@ LOAD LUA FILE: C:/Users/Feynman/Desktop/texas/src/main.lua
 
 [LUA-print] [INFO] #
 
-[LUA-print] table: 0x0c90f1e8
-
-[LUA-print] dump from: [string "C:/Users/Feynman/Desktop/texas/src/app/models/battle/Game.lua"]:187: in function 'dark'
-
-[LUA-print] - "<var>" = {
-
-[LUA-print] -     1  = userdata: 0x0c8b8cc0
-
-[LUA-print] -     2  = userdata: 0x0bbd6000
-
-[LUA-print] -     3  = userdata: 0x0c8b2800
-
-[LUA-print] -     4  = userdata: 0x0c8b42a8
-
-[LUA-print] -     5  = userdata: 0x0c8b63d0
-
-[LUA-print] -     6  = userdata: 0x0c8b85d8
-
-[LUA-print] -     7  = userdata: 0x0c8ba5a0
-
-[LUA-print] -     8  = userdata: 0x0c8cef70
-
-[LUA-print] -     9  = userdata: 0x0c8dba48
-
-[LUA-print] -     10 = userdata: 0x0c8cef50
-
-[LUA-print] -     11 = userdata: 0x0c8f4e30
-
-[LUA-print] -     12 = userdata: 0x0c901f50
-
-[LUA-print] -     13 = userdata: 0x0c90f978
-
-[LUA-print] -     14 = userdata: 0x0c8c2ae0
-
-[LUA-print] -     15 = userdata: 0x0c8c5938
-
-[LUA-print] -     16 = userdata: 0x0c8c83d0
-
-[LUA-print] - }
-
-Get data from file(ui/panel/straight.png) failed, error code is 3
+[LUA-print] table: 0x0a8eb880
 
 [LUA-print] flip
 
 [LUA-print] delay
+
+Get data from file(ui/panel/flush.png) failed, error code is 3
 

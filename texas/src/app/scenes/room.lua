@@ -88,36 +88,50 @@ function room:createinfo(panel)
 end
 
 
-function room:createbtns()
-	self:newbtn("square")
-	self:newbtn("addfriend")
-	self:newbtn("adjust")
-	self:newbtn("dialog")
-
+function room:createbtns()	
+	self:square()
+	self:addfriend()
+	self:adjust()
+	self:dialog()
 end
 
-function room:newbtn(name,func)
-	local location = {
-		square= cc.p(0.04,0.94),
-		addfriend= cc.p(0.89,0.94),
-		adjust= cc.p(0.96,0.94), 
-		dialog= cc.p(0.04,0.08)
-	}
+function room:square()
+	self:newbtn(self, "square", cc.p(0.04,0.94), _,function() 
+		local bg = mm.window.new(self, 2.5, true)
+		bg:setpos{align = cc.p(0,1), anch = cc.p(0,1),}
+		local bt ={"return", "change", "standup", "cardkind"}
+		for i, name in pairs(bt) do
+			self:newimg(bg, name, cc.p(0.5,1.13-0.22*i), cc.p(0,1))
+			self:newbtn(bg, name.."btn", cc.p(0.5,1.13-0.22*i), cc.p(1,1))		
+		end
+	end)
+end
+
+function room:addfriend()
+	local img = self:newimg(self, "circle", cc.p(0.89,0.94))
+	self:newbtn(img, "addfriend")
+end
+
+function room:adjust()
+	local img = self:newimg(self, "circle", cc.p(0.96,0.94))
+	self:newbtn(img, "addfriend")
+end
+
+function room:dialog()
+	local img = self:newimg(self, "circle", cc.p(0.04,0.08))
+	self:newbtn(img, "addfriend")
+end
+
+function room:newbtn(node, name, align, anch, func)
 	local btn=xxui.create{
-		node=self,btn=xxres.button(name),
-		anch=cc.p(0.5,0.5),align=location[name],
+		node=node, btn=xxres.button(name), name = name,
+		anch=anch or cc.p(0.5,0.5), align=align or cc.p(0.5,0.5),
 		func=func or function()end
-	}	
-	if name ~="square" then
-		xxui.create{
-			node=btn,img=xxres.button("circle"),
-			anch=cc.p(0.5,0.5),align=cc.p(0.5,0.5)
-		}
-	end
+	}		
 	return btn
 end
 
-function room:newtxt(node,name,align)
+function room:newtxt(node, name, align)
 	local color=cc.c3b(149,183,155)
 	local txt=xx.translate{name,":"}
 	xxui.create{
@@ -130,7 +144,16 @@ function room:newtxt(node,name,align)
 		font="txt",
 		anch=cc.p(0,0.5),align=align,
 	}
+end
 
+function room:newimg(node,name,align,anch,path)
+	local path = path or"button"
+	path = "ui/"..path.."/"..name..".png"
+	local img = xxui.create{
+		node = node, img = path,
+		anch = anch or cc.p(0.5,0.5), align = align or cc.p(0.5,0.5),
+	}
+	return img
 end
 
 function room:newtime(panel)

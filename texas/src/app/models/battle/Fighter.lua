@@ -19,6 +19,11 @@ function Fighter:ctor(battle,idx,state)
 	self.state = state
 	self.data = {cards = {}}
 	self.account = {money = 16000, mybet = 970, raise = 0, blinds = "big"}
+	self.info = {name = "任盈盈"..idx, coin = "1.94万", lv = 4, roundnum= 114, 
+		winrate = "22%", joinrate = "62%", fliprate = "28%",
+		diamond = 100, gender = "female",
+		 maxcardtype = {{cls = "spade", idx = 1}, {cls = "spade", idx =13},
+		 {cls = "spade",idx = 12},{cls = "spade", idx = 11},{cls = "spade", idx = 10}} }
 	self.pot = {total = 1600, maxbet = 1000, minraise = 0}
 ---------test data----------------
 	self.poker={}
@@ -226,13 +231,26 @@ function Fighter:init()
 	self:blinds()
 end
 
+function Fighter:newimg(node,name,align,anch,path)
+	local path = path or"panel"
+	path = "ui/"..path.."/"..name..".png"
+	local img = xxui.create{
+		node = node, img = path, name = name,
+		anch = anch or cc.p(0.5,0.5), align = align or cc.p(0.5,0.5),
+	}
+	return img
+end
+
+function Fighter:newtxt(node,txt,name,align,anch)
+	local txt = xxui.create{
+		node = node, txt = txt or "", name = name,
+		align = align or cc.p(0.5,0.5), anch = anch or cc.p(0.5,0.5),
+	}
+	return txt
+end
+
 function Fighter:createplayer()
-	local panel =xxui.create{
-			node=self, img=xxres.panel("head_back"),
-			name="head_back",
-			anch=cc.p(0.5,0.5),align=cc.p(0.5,0.5)
-		}
-	
+	local panel = self:newimg(self,"head_back")	
 	self:createinfo(panel)
 	self:setsize(panel)
 	self:set{
@@ -241,31 +259,86 @@ function Fighter:createplayer()
 		}
 end
 
+function Fighter:createinfo(panel)	
+	local name = self:newtxt(panel,self.info.name,"name",cc.p(0.5,0.86))
+		name:set{size = 37, color = cc.c3b(242,242,242)}
 
-function Fighter:createinfo(panel)
-	local i = self:seatnum()
-	local me=self.battle:get("me")
-	local text="任盈盈"..i.."号"
-	xxui.create{
-		node = panel, txt = text, name = "name",
-		size = 37, color = cc.c3b(242,242,242),
-		anch = cc.p(0.5,0.5), align = cc.p(0.5,0.86),		
-	}
-	xxui.create{
-		node = panel, img = xxres.panel("head"), name="head",
-		anch = cc.p(0.5,0.5), align = cc.p(0.5,0.5)
-	}
-	xxui.create{
-		node = panel, img =xxres.panel("head_frame"),
-		anch = cc.p(0.5,0.5), align = cc.p(0.5,0.5),
-	}
-	xxui.create{
-		node = panel, txt= self.account.money, name = "score",
-		size =37, color = cc.c3b(252,222,143),
-		anch=cc.p(0.5,0.5),align=cc.p(0.5,0.14),
-	}
+	local head = self:newimg(panel, "head")
+	head:addTouchEvent(function()
+		print("player",self.idx)
+		self:infowindow()
+	end)
+
+	self:newimg(panel,"head_frame")
+	
+	local score = self:newtxt(panel, self.account.money,"score",cc.p(0.5,0.14))
+	score:set{size = 37, color = cc.c3b(252,222,143)}
+	
+	if self:is("me") then 
+		local cardtype = self:newtxt(panel, _, "cardtype",cc.p(1.6,0.1))
+		cardtype:set{size = 37, color = cc.c3b(242,242,242)}
+	end
 end
 
+function Fighter:infowindow()
+	local win = mm.window.new(self.scene,1.5,true)
+
+	local head_cir = self:newimg(win, "head_circle",cc.p(0.18,0.88))
+	self:newimg(head_cir,"head")
+
+	local imgtbl ={self.info.gender,"win_lv","win_$","win_diamond"}
+	local imgpos = {cc.p(0.36,0.88), cc.p(0.76,0.88),cc.p(0.36,0.77), cc.p(0.72,0.77)}
+	local txttbl = {self.info.name, "LV."..self.info.lv, self.info.coin,self.info.diamond}
+	local txtpos = {cc.p(1,0.5), cc.p(0.25,0.5),cc.p(1,0.5), cc.p(0.8,0.5)}
+	for i, img in pairs(imgtbl) do
+		local pic = self:newimg(win, img, imgpos[i], cc.p(1,0.5))
+		local color = cc.c3b(239, 197, 136)
+		if txttbl[i] == self.info.name then 
+			color = cc.c3b(255,255,255)
+		end 
+		local pictxt = self:newtxt(pic, txttbl[i], _, txtpos[i], cc.p(0,0.5))
+		pictxt:set{size = 45, color = color}
+	end
+
+	local lblack = self:newimg(win, "win_black", cc.p(0.5,0.4), cc.p(1,0.5))
+	lblack:set{name = "win_lblack"}
+	local rblack = self:newimg(win, "win_black", cc.p(0.5,0.4), cc.p(1,0.5))
+	rblack:set{name = "win_rblack"}
+	rblack:setFlippedX(true)
+
+	local tbl = {"roundnum", "joinrate", "winrate", "fliprate", "maxcardtype"}
+	local pos = {cc.p(0.3,0.59), cc.p(0.7,0.59), cc.p(0.3,0.49), cc.p(0.7,0.49), cc.p(0.5,0.37)}
+	for i, text in pairs(tbl) do
+		if text == "maxcardtype" then 
+			text = xx.translate(text)
+		else
+			local num = self.info[text]
+			text = xx.translate{text}..": "..num
+		end
+		local w = self:newtxt(win, text, _, pos[i])
+		w:set{size = 47, color = cc.c3b(144, 139, 212)}
+	end
+
+	local card = self.info.maxcardtype
+	for i = 1, 5 do 
+		local pth = "obj/poker/poker_"
+		local idx = card[i].idx
+		local cls = card[i].cls
+		local c = string.sub(cls, 1, 1)
+		pth = table.concat {
+			pth, c, idx, ".png"
+		}
+
+		local x = 0.5-(3-i)*0.08
+		xxui.create{
+			node = win, img = pth, 
+			anch = cc.p(0.5,0.5), align = cc.p(x,0.25),
+			scale = 1.3,
+		}
+	end
+
+
+end
 
 
 --------------my buttons----------------------
@@ -348,11 +421,9 @@ function Fighter:newtxtbtn(param)
 end
 
 function Fighter:potbtncreate(node)
-	local btnback = xxui.create{
-			node = node, img = xxres.icon("pot_double"),
-			anch = cc.p(1,0.5), align =cc.p(0.1,0.36),
-			zorder=-2
-		}
+	local btnback = self:newimg(node, "pot_double", 
+		cc.p(0.1,0.36), cc.p(1,0.5),"icon")
+	btnback:zorder(-2)
 	for i = 1, 3 do 
 		self:newtxtbtn{
 			node = btnback, mode = "pot_black",
@@ -426,16 +497,12 @@ function Fighter:sliderimg()
 end
 ---w is the slider-----------------
 function Fighter:sliderinfo(w,align,text)
-	local info = xxui.create{
-		node = w,img = xxres.grid("slider_info"),
-		anch = cc.p(0.8,0.5), align = align,
-		zorder = 5
- 	}
- 	local infotxt = xxui.create{
- 		node = info, txt = text, name = "infotxt",
- 		pos = "center",
- 		size = 62, color = cc.c3b(80,80,80)
- 	}
+	local info = self:newimg(w, "slider_info", align, cc.p(0.8,0.5), "grid")
+	info:zorder(5)
+
+ 	local infotxt = self:newtxt(info, text,"infotxt")
+ 	infotxt:set{size = 62, color = cc.c3b(80,80,80)}
+ 	
  	infotxt:rotation(90)
  	return info
 end
@@ -449,21 +516,19 @@ function Fighter:sliderinfopos(w)
 	return cc.p(x,y)
 end
 
-function Fighter:headinfo(name)
-	local panel = self:getchild("head_back")
-	xxui.create{
-		node = panel, img = xxres.panel(name), 
-		anch = cc.p(0.5,0.5), align = cc.p(0.5,0.86),
-		zorder = 2,
-	}
-	local name = panel:getchild("name")
-	name:setVisible(false)
-
+function Fighter:headinfo(name)	  
+		local panel = self:getchild("head_back")
+		local info = self:newimg(panel, name, cc.p(0.5,0.86))
+		info:zorder(2)
+		
+		local name = panel:getchild("name")
+		name:setVisible(false)
 end
 
 -----color = "blue", "orange", "red", "green", "purple"
 function Fighter:createchip(num,color)
 	local color = color or "red"
+	color = "chip_"..color
 	local posit = {
 	cc.p(-0.4,0.86), cc.p(0.55,1.04),
 	cc.p(1.45,0.86), cc.p(-0.02,-0.02),
@@ -471,26 +536,19 @@ function Fighter:createchip(num,color)
 	}
 	local panel = self:getchild("head_back")
 	local i = self:seatnum()
-	local back = xxui.create{
-		node = panel, img = xxres.icon("chip_back"),
-		anch = cc.p(0.5,0.5), align = posit[i],
-		name = "chip",
-	}
+	local back = self:newimg(panel, "chip_back", posit[i], _, "icon")
+
 	local dir
 	if i == 2 or i == 3 then  
 		dir = cc.p(0.1,0.5)
 	else
 		dir = cc.p(0.9,0.5)
 	end 
-	local coin = xxui.create{
-		node = back, img = xxres.icon("chip_"..color),
-		anch = cc.p(0.5,0.5), align = dir,
-	}
-	local txt = xxui.create{
-		node = back, txt = num, name = "chipnum",
-		anch = cc.p(0.5,0.5), align = cc.p(0.5,0.5),
-		size = 37, color = cc.c3b(252,222,143),
-	}
+	local coin = self:newimg(back, color, dir, _, "icon")
+	
+	local txt = self:newtxt(back, num, "chipnum")
+	txt:set{size = 37, color =cc.c3b(252,222,143)}
+	
 end
 
 function Fighter:timecount(time)
@@ -507,36 +565,25 @@ end
 function Fighter:blinds()
 	local panel = self:getchild("head_back")
 	if self.account.blinds == "big" then 
-		local icon = xxui.create{
-			node = panel, img = xxres.panel("blinds"),
-			name = "blinds", 
-			anch = cc.p(0.5,0.5), align = cc.p(-0.05,0.25),
-		}
+		local icon = self:newimg(panel, "blinds",cc.p(-0.05,0.25))
 	end
 end
 
-function Fighter:win(type,i)	
-	local frame = xxui.create{
-		node = self:getchild("head_back"), img = xxres.panel("head_victory"),
-		anch = cc.p(0.5,0.5), align = cc.p(0.5,0.5),
-	}
-	self:headinfo(type)
+function Fighter:win(rank,i)	
+	local frame = self:newimg(self:getchild("head_back"), "head_victory")
+	self:headinfo(rank)
 	self:pokerhl(i)
 	self:winscore()
 end
--- :getchild("head_back")
+
 function Fighter:winscore()
-	local score = xxui.create{
-		node = self, txt = "+1200", 
-		name = "score", zorder = 2,
-		anch = cc.p(0.5,0.5), align = cc.p(0,0), 
-		size = 75, color = cc.c3b(250, 247, 2),
-	}
-	score:setOpacity(0)
-	score:moveby(0.5,cc.p(0,100),function()
+	local winscore = self:newtxt(self, "+1200", "winscore", cc.p(0,0))
+	winscore:set{size = 75, color = cc.c3b(250, 247, 2)}
+	winscore:setOpacity(0)
+	winscore:moveby(0.5,cc.p(0,100),function()
 		-- score:fadeout(0.5,true)
 		end)	
-	score:fadein(0.1,false)
+	winscore:fadein(0.1,false)
 end
 
 function Fighter:pokerhl(i)

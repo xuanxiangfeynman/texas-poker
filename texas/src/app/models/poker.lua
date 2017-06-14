@@ -155,7 +155,7 @@ function poker:highlight()
 		anch = cc.p(0,0), align = cc.p(-0.17,-0.11),
 		zorder = -1, scale = 0.5,
 	}
-	self:setopacity(1,true)
+	self:zorder(2)
 end
 
 return poker

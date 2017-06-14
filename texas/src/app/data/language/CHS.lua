@@ -6,8 +6,11 @@ tbl.char = {
 }
 
 tbl.default = {
-    roundnum = "局数", turning  = "坐庄", roomnum  = "房号",
-    rotated = "轮庄", fixed = "固定庄", challenged = "抢庄",
+    roundnum = "牌局", joinrate = "入局率", 
+    winrate = "胜率", fliprate = "摊牌率",
+    maxcardtype = "最大牌型",
+
+    roomnum  = "房号",
     raise = "倍", player = "玩家", cards = "手牌", rank = "牌型",
     addscore = "积分",
     pot = "底池", whitehand = "白手起家(6人)", poker = "扑克牌",
